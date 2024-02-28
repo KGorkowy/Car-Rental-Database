@@ -2,6 +2,7 @@ package com.example.demo.cars;
 
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -54,46 +55,22 @@ public class CarController {
     }
 
     @DeleteMapping("/delete")
-    public void deleteCar(Long id){
-        Optional<Car> c = carRepository.findById(id);
-        c = Optional.empty();
-        
+    public void deleteCar(@RequestBody Long id){
+        carRepository.deleteById(id);
     }
 
     @Transactional
     @PutMapping("/edit")
-    public void editCar(Long id, Car car) {
-        Optional<Car> c = carRepository.findById(id);
+    public void editCar(@RequestBody Car car) {
+        Optional<Car> c = carRepository.findById(car.getId());
         if (c.isPresent()) {
             c.get().setBrand(car.getBrand());
             c.get().setPlateNumber(car.getPlateNumber());
             c.get().setDrivenDistanceInKm(car.getDrivenDistanceInKm());
             carRepository.save(c.get());
         }
-
-//        version 2
-//        List<Car> list = carRepository.findAll();
-//        boolean flag = true; //checking if the given car exists
-//        for (Car car1 : list)
-//        {
-//            if (car1.getPlateNumber().equals(car.getPlateNumber()))
-//            {
-//                car1.setBrand(car.getBrand());
-//                car1.setPlateNumber(car.getPlateNumber());
-//                car1.setDrivenDistanceInKm(car.getDrivenDistanceInKm());
-//                flag = false;
-//            }
-//        }
-//        if (flag)
-//        {
-//            log.info("");
-//        }
-
-//        version 3
-
-
+        else log.info("the given id does not exist");
 
     }
-
 
 }
