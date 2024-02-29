@@ -26,22 +26,24 @@ public class CustomerController {
     @Transactional
     public Customer addCustomer(@RequestBody Customer customer) {
         // phone number must be unique and its length must be equal to 9
-        List<Customer> list = customerRepository.findAll();
-        boolean flag = true;
-        for (Customer cust : list) {
-            if (cust.getPhoneNumber().equals(customer.getPhoneNumber()))
-            {
-                flag = false;
-                break;
+        if (customer.getPhoneNumber().length() == 9) {
+            List<Customer> list = customerRepository.findAll();
+            boolean flag = true;
+            for (Customer cust : list) {
+                if (cust.getPhoneNumber().equals(customer.getPhoneNumber())) {
+                    flag = false;
+                    break;
+                }
+            }
+            if (flag) {
+                return customerRepository.save(customer);
+            } else {
+                log.info("phone number {} already exists", customer.getPhoneNumber());
+                return customer;
             }
         }
-        if (flag)
-        {
-            return customerRepository.save(customer);
-        }
-        else
-        {
-            log.info("phone number {} already exists", customer.getPhoneNumber());
+        else {
+            log.info("invalid phone number");
             return customer;
         }
     }
