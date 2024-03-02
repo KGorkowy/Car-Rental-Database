@@ -14,10 +14,13 @@ public class Customer {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     @NotBlank(message = "first name is mandatory")
+    @Column(nullable = false, length = 25)
     private String firstName;
     @NotBlank(message = "Please provide surname")
+    @Column(nullable = false, length = 25)
     private String surname;
 
     @Pattern(regexp = "^[ ]*\\d{9}[ ]*$", message = "Phone has a wrong format. IT should be eg: 789789789")
+    @Column(unique = true, nullable = false)
     private String phoneNumber;
 }
