@@ -5,8 +5,8 @@ import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
-
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/reservation")
@@ -27,7 +27,7 @@ public class ReservationController {
     @Transactional
     public Reservation addReservation(@RequestBody Reservation reservation)
     {
-        // to do: one customer can have one car simultaneously, one car can't be reserved twice at the same time,
+        // todo: one customer can have one car simultaneously, one car can't be reserved twice at the same time,
         // start time can only be earlier than end time - learn time formatting
         log.info("adding reservation {}", reservation.toString());
         return reservationRepository.save(reservation);

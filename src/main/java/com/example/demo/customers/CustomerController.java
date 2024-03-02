@@ -48,5 +48,7 @@ public class CustomerController {
         return ResponseEntity.notFound().build();
     }
 
+    // todo: Put for discounting
+
 
 }
