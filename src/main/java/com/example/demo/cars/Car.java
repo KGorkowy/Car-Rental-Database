@@ -18,6 +18,9 @@ public class Car {
     @NotBlank(message = "driven distance is mandatory")
     @Column(nullable = false, length = 10)
     private Integer drivenDistanceInKm;
+    @NotBlank(message = "car type is mandatory")
+    @Column(nullable = false, length = 15)
+    private String carType;
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;

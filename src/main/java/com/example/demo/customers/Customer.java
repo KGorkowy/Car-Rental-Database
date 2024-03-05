@@ -25,5 +25,5 @@ public class Customer {
     private String phoneNumber;
     @NotBlank(message = "first name is mandatory")
     @Column(length = 3) // 0-100
-    private Short discountPercentage = 0;
+    private double discountPercentage = 0;
 }
