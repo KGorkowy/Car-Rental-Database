@@ -23,7 +23,7 @@ public class ReservationController {
         return reservationRepository.findAll();
     }
 
-    @PostMapping("/new")
+    @PostMapping("/")
     @Transactional
     public Reservation addReservation(@RequestBody Reservation reservation)
     {
@@ -33,12 +33,12 @@ public class ReservationController {
         return reservationRepository.save(reservation);
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     public void deleteReservation(@PathVariable Long id){
         reservationRepository.deleteById(id);
     }
 
-    @PutMapping("/edit")
+    @PutMapping("/")
     @Transactional
     public void editReservation(@RequestBody Reservation reservation)
     {

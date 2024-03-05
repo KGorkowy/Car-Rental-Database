@@ -48,7 +48,16 @@ public class CustomerController {
         return ResponseEntity.notFound().build();
     }
 
-    // todo: Put for discounting
 
+    @PutMapping("/discount")
+    @Transactional
+    public ResponseEntity<Void> changeDiscount(@RequestParam Long id, @RequestParam double newDiscountPercentage) {
+        Optional<Customer> customer = customerRepository.findById(id);
+        if (customer.isPresent()) {
+            customer.get().setDiscountPercentage(newDiscountPercentage);
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.notFound().build();
+    }
 
 }

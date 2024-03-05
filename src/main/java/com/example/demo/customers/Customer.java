@@ -23,7 +23,6 @@ public class Customer {
     @Pattern(regexp = "^[ ]*\\d{9}[ ]*$", message = "Phone has a wrong format. IT should be eg: 789789789")
     @Column(unique = true, nullable = false)
     private String phoneNumber;
-    @NotBlank(message = "first name is mandatory")
     @Column(length = 3) // 0-100
     private double discountPercentage = 0;
 }

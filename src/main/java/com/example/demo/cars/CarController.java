@@ -4,7 +4,9 @@ import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/car")
@@ -16,12 +18,12 @@ public class CarController {
         this.carRepository = carRepository;
     }
 
-    @GetMapping("/all")
+    @GetMapping("/")
     public List<Car> getCars(){
         return carRepository.findAll();
     }
 
-    @PostMapping
+    @PostMapping("/")
     @Transactional
     public Car addCar(@RequestBody Car car){
         log.info("adding car {}", car.toString());
@@ -53,13 +55,13 @@ public class CarController {
 
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     public void deleteCar(@PathVariable Long id){
         carRepository.deleteById(id);
     }
 
     @Transactional
-    @PutMapping("/edit")
+    @PutMapping("/")
     public void editCar(@RequestBody Car car) {
         Optional<Car> c = carRepository.findById(car.getId());
         if (c.isPresent()) {
