@@ -3,6 +3,7 @@ package com.example.demo.cars;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,9 +23,14 @@ public class CarController {
     }
 
     @PostMapping
-    public Car addCar(@RequestBody Car car){
-        log.info("adding car {}", car.toString());
-        return carService.addCar(car);
+    public ResponseEntity addCar(@RequestBody Car car) {
+        try {
+            log.info("adding car {}", car.toString());
+            return ResponseEntity.ok(carService.addCar(car));
+        }
+        catch(Throwable t){
+            return ResponseEntity.badRequest().body(t.getMessage());
+        }
     }
 
     @DeleteMapping("/{id}")
