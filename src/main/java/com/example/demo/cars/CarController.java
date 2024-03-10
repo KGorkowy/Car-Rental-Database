@@ -68,6 +68,7 @@ public class CarController {
             c.get().setBrand(car.getBrand());
             c.get().setPlateNumber(car.getPlateNumber());
             c.get().setDrivenDistanceInKm(car.getDrivenDistanceInKm());
+            c.get().setCarType(car.getCarType());
             carRepository.save(c.get());
         }
         else log.info("the given id does not exist");

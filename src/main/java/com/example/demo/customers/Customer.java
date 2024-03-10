@@ -20,7 +20,7 @@ public class Customer {
     @Column(nullable = false, length = 25)
     private String surname;
 
-    @Pattern(regexp = "^[ ]*\\d{9}[ ]*$", message = "Phone has a wrong format. IT should be eg: 789789789")
+    @Pattern(regexp = "^[ ]*\\d{9}[ ]*$", message = "Phone has a wrong format. IT should be eg: 789789789") //todo: ask if the number should be with blank spaces
     @Column(unique = true, nullable = false)
     private String phoneNumber;
     @Column(length = 3) // 0-100

@@ -1,6 +1,8 @@
 package com.example.demo.reservations;
 
 
+import com.example.demo.cars.CarRepository;
+import com.example.demo.customers.CustomerRepository;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -13,9 +15,13 @@ import java.util.Optional;
 @Slf4j
 public class ReservationController {
     private final ReservationRepository reservationRepository;
+    private final CustomerRepository customerRepository;
+    private final CarRepository carRepository;
 
-    public ReservationController(ReservationRepository reservationRepository) {
+    public ReservationController(ReservationRepository reservationRepository, CustomerRepository customerRepository, CarRepository carRepository) {
         this.reservationRepository = reservationRepository;
+        this.customerRepository = customerRepository;
+        this.carRepository = carRepository;
     }
 
     @GetMapping("/all")
@@ -52,4 +58,20 @@ public class ReservationController {
         }
         else log.info("the given id does not exist");
     }
+
+    /*@GetMapping("/{id}")
+    public double getPricing(@PathVariable Long id) {
+        Optional<Reservation> reservation = reservationRepository.findById(id);
+        Optional<Customer> customer = customerRepository.findById(reservation.get().getCustomerId());
+        if (reservation.isPresent())
+        {
+            return Pricing.calculatePrice(reservationRepository.findById(id).get().getStartDate(), reservationRepository.findById(id).get().getEndDate(), customer, car);
+        }
+        else
+            throw new RuntimeException("given reservation doesn't exist");
+
+
+
+    }*/
+
 }

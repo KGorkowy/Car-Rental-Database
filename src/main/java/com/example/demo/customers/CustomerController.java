@@ -26,7 +26,7 @@ public class CustomerController {
 
     @PostMapping("/")
     @Transactional
-    public Customer addCustomer(@Valid @RequestBody Customer customer) {
+    public Customer addCustomer(@RequestBody Customer customer) {
             return customerRepository.save(customer);
     }
 
@@ -51,10 +51,10 @@ public class CustomerController {
 
     @PutMapping("/discount")
     @Transactional
-    public ResponseEntity<Void> changeDiscount(@RequestParam Long id, @RequestParam double newDiscountPercentage) {
+    public ResponseEntity<Void> changeDiscount(@RequestParam Long id, @RequestParam double discount) {
         Optional<Customer> customer = customerRepository.findById(id);
         if (customer.isPresent()) {
-            customer.get().setDiscountPercentage(newDiscountPercentage);
+            customer.get().setDiscountPercentage(discount);
             return ResponseEntity.ok().build();
         }
         return ResponseEntity.notFound().build();

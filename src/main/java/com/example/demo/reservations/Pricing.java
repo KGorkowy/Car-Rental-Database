@@ -2,6 +2,7 @@ package com.example.demo.reservations;
 
 import com.example.demo.cars.Car;
 import com.example.demo.customers.Customer;
+import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDate;
 
@@ -9,8 +10,8 @@ import static java.time.temporal.ChronoUnit.DAYS;
 
 public class Pricing {
 
-    double calculatePrice(LocalDate start , LocalDate end, Customer customer, Car car){
-        var diff = DAYS.between(start, end);;
+     public static double calculatePrice(LocalDate start, LocalDate end, @NotNull Customer customer, @NotNull Car car){
+        var diff = DAYS.between(start, end);
 
         float basicPrice = switch (car.getCarType()){
             case "hatchback":
