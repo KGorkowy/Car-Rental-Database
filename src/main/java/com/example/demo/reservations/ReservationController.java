@@ -33,8 +33,7 @@ public class ReservationController {
     @Transactional
     public Reservation addReservation(@RequestBody Reservation reservation)
     {
-        // todo: one customer can have one car simultaneously, one car can't be reserved twice at the same time,
-        // start time can only be earlier than end time - learn time formatting
+        // todo: one customer can have one car simultaneously, one car can't be reserved twice at the same time
         log.info("adding reservation {}", reservation.toString());
         return reservationRepository.save(reservation);
     }
