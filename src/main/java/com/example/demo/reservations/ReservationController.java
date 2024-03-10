@@ -1,6 +1,7 @@
 package com.example.demo.reservations;
 
 
+import com.example.demo.cars.Car;
 import com.example.demo.cars.CarRepository;
 import com.example.demo.customers.CustomerRepository;
 import jakarta.transaction.Transactional;
@@ -35,8 +36,12 @@ public class ReservationController {
     {
         // todo: one customer can have one car simultaneously, one car can't be reserved twice at the same time
         log.info("adding reservation {}", reservation.toString());
-        return reservationRepository.save(reservation);
-    }
+        Optional<Car> c = carRepository.findById(reservation.getCar().getId());
+        if(c.isPresent()) {
+            return reservationRepository.save(reservation);
+        }
+        return null;
+    } // todo: make it like putmapping
 
     @DeleteMapping("/{id}")
     public void deleteReservation(@PathVariable Long id){
@@ -47,10 +52,12 @@ public class ReservationController {
     @Transactional
     public void editReservation(@RequestBody Reservation reservation)
     {
+
+        Optional<Car> c = carRepository.findById(reservation.getCar().getId());
         Optional<Reservation> res = reservationRepository.findById(reservation.getId());
-        if (res.isPresent())
+        if (res.isPresent() && c.isPresent())
         {
-            res.get().setCarId(reservation.getCarId());
+            res.get().setCar(c.get());
             res.get().setCustomerId(reservation.getCustomerId());
             res.get().setStartDate(reservation.getStartDate());
             res.get().setEndDate(reservation.getEndDate());
