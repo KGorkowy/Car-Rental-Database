@@ -1,23 +1,20 @@
 package com.example.demo.customers;
 
-import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/customer")
 @Slf4j
+@AllArgsConstructor
 public class CustomerController {
     private final CustomerRepository customerRepository;
-
-    public CustomerController(CustomerRepository customerRepository) {
-        this.customerRepository = customerRepository;
-    }
+    private final CustomerService customerService;
 
     @GetMapping("/all")
     public List<Customer> getCustomers() {
@@ -25,8 +22,14 @@ public class CustomerController {
     }
 
     @PostMapping("/")
-    public Customer addCustomer(@RequestBody Customer customer) {
-        return customerRepository.save(customer);
+    public ResponseEntity<?> addCustomer(@RequestBody Customer customer) {
+        try {
+            log.info("adding customer {}", customer.toString());
+            return ResponseEntity.ok(customerService.addCustomer(customer));
+        }
+        catch(Throwable t){
+            return ResponseEntity.badRequest().body(t.getMessage());
+        }
     }
 
     @DeleteMapping("/{id}")
@@ -35,29 +38,37 @@ public class CustomerController {
     }
 
     @PutMapping("/")
-    @Transactional
-    public ResponseEntity editCustomer(@Valid @RequestBody Customer customer) {
-        return customerRepository.findById(customer.getId())
-                .map(customer1 -> {
-                    customer1.setFirstName(customer.getFirstName());
-                    customer1.setSurname(customer.getSurname());
-                    customer1.setPhoneNumber(customer.getPhoneNumber());
-                    //save
-                    return ResponseEntity.ok().build();
-                })
-                .orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<?> editCustomer(@Valid @RequestBody Customer customer) {
+        if (customerRepository.findById(customer.getId()).isPresent()) {
+            if (!customerRepository.findById(customer.getId()).get().getPhoneNumber().equals(customer.getPhoneNumber())) {
+                if (customerRepository.checkPhoneNumberUniqueness(customer.getPhoneNumber()) != 0) {
+                    return ResponseEntity.badRequest().body("phone number is not unique");
+                }
+                else {
+                    log.info("editing customer with id {}", customer.getId());
+                    return customerService.editCustomer(customer);
+                }
+            }
+            else {
+                log.info("editing customer with id {}", customer.getId());
+                return customerService.editCustomer(customer);
+            }
+        }
+        else {
+            return ResponseEntity.badRequest().body("given customer id does not exist");
+        }
     }
 
 
     @PutMapping("/discount")
-    @Transactional
-    public ResponseEntity<Void> changeDiscount(@RequestParam Long id, @RequestParam double discount) {
-        Optional<Customer> customer = customerRepository.findById(id);
-        if (customer.isPresent()) {
-            customer.get().setDiscountPercentage(discount);
-            return ResponseEntity.ok().build();
+    public ResponseEntity<?> changeDiscount(@RequestParam Long id, @RequestParam double discount) {
+        try {
+            log.info("changing discount of customer with id {}", id);
+            return ResponseEntity.ok(customerService.editDiscount(id, discount));
         }
-        return ResponseEntity.notFound().build();
+        catch(Throwable t){
+            return ResponseEntity.badRequest().body(t.getMessage());
+        }
     }
 
 }

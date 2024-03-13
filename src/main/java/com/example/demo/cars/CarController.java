@@ -23,7 +23,7 @@ public class CarController {
     }
 
     @PostMapping
-    public ResponseEntity addCar(@RequestBody Car car) {
+    public ResponseEntity<?> addCar(@RequestBody Car car) {
         try {
             log.info("adding car {}", car.toString());
             return ResponseEntity.ok(carService.addCar(car));
@@ -40,17 +40,20 @@ public class CarController {
 
     @Transactional
     @PutMapping("/")
-    public ResponseEntity editCustomer(@Valid @RequestBody Car car) {
+    public ResponseEntity<?> editCar(@Valid @RequestBody Car car) {
+        // to avoid counting number plate of edited car if number plate isn't being changed
         if (carRepository.findById(car.getId()).isPresent()) {
             if (!carRepository.findById(car.getId()).get().getPlateNumber().equals(car.getPlateNumber())) {
                 if (carRepository.checkCarPlatesUniqueness(car.getPlateNumber()) != 0) {
                     return ResponseEntity.badRequest().body("number plate is not unique");
                 }
                 else {
+                    log.info("editing car with id {}", car.getId());
                     return carService.editCar(car);
                 }
             }
             else {
+                log.info("editing car with id {}", car.getId());
                 return carService.editCar(car);
             }
         }
