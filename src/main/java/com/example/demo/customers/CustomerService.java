@@ -30,7 +30,7 @@ public class CustomerService {
                     customer1.setFirstName(customer.getFirstName());
                     customer1.setSurname(customer.getSurname());
                     customer1.setPhoneNumber(customer.getPhoneNumber());
-                    customer1.setDiscountPercentage(0.0);
+                    customer1.setDiscountPercentage(0.0); // setting percentage to default, safety reasons
                     //save
                     return ResponseEntity.ok().build();
                 })

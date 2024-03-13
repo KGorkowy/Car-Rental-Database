@@ -1,11 +1,12 @@
 package com.example.demo.reservations;
 
 
-import com.example.demo.cars.Car;
 import com.example.demo.cars.CarRepository;
 import com.example.demo.customers.CustomerRepository;
 import jakarta.transaction.Transactional;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,16 +15,12 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/reservation")
 @Slf4j
+@AllArgsConstructor
 public class ReservationController {
     private final ReservationRepository reservationRepository;
     private final CustomerRepository customerRepository;
     private final CarRepository carRepository;
-
-    public ReservationController(ReservationRepository reservationRepository, CustomerRepository customerRepository, CarRepository carRepository) {
-        this.reservationRepository = reservationRepository;
-        this.customerRepository = customerRepository;
-        this.carRepository = carRepository;
-    }
+    private final ReservationService reservationService;
 
     @GetMapping("/all")
     public List<Reservation> getCars(){
@@ -31,17 +28,37 @@ public class ReservationController {
     }
 
     @PostMapping("/")
-    @Transactional
-    public Reservation addReservation(@RequestBody Reservation reservation)
+    public ResponseEntity<?> addReservation(@RequestBody Reservation reservation)
     {
-        // todo: one customer can have one car simultaneously, one car can't be reserved twice at the same time
-        log.info("adding reservation {}", reservation.toString());
-        Optional<Car> c = carRepository.findById(reservation.getCar().getId());
-        if(c.isPresent()) {
-            return reservationRepository.save(reservation);
+        // todo: ask if it should be inverted
+        try {
+            List<Reservation> listOfAllReservations = reservationRepository.findAll();
+            // checking if reservation doesn't have an invalid customer or car
+            for (Reservation res : listOfAllReservations) {
+                if ((res.getStartDate().isBefore(reservation.getStartDate()) && res.getEndDate().isAfter(reservation.getStartDate())) ||
+                        (res.getStartDate().isAfter(reservation.getStartDate()) && res.getEndDate().isBefore(reservation.getEndDate())) ||
+                        (res.getStartDate().isBefore(reservation.getEndDate()) && res.getEndDate().isAfter(reservation.getEndDate())) ||
+                        res.getStartDate().isEqual(reservation.getStartDate()) || res.getEndDate().isEqual(reservation.getEndDate())) {
+                    if (res.getCustomerId().equals(reservation.getCustomerId())) {
+                        return ResponseEntity.badRequest().body("given customer already rents a car in given period");
+                    }
+                    else if (res.getCar().getId().equals(reservation.getCar().getId())) {
+                        return ResponseEntity.badRequest().body("given car is already rented in given period");
+                    }
+                }
+            }
+            if (reservation.getStartDate().isBefore(reservation.getEndDate())) {
+                log.info("adding reservation {}", reservation);
+                return ResponseEntity.ok(reservationService.addReservation(reservation));
+            }
+            else {
+                return ResponseEntity.badRequest().body("given period is not valid - start date after end date");
+            }
         }
-        return null;
-    } // todo: make it like putmapping
+        catch(Throwable t){
+            return ResponseEntity.badRequest().body(t.getMessage());
+        }
+    }
 
     @DeleteMapping("/{id}")
     public void deleteReservation(@PathVariable Long id){
@@ -50,34 +67,47 @@ public class ReservationController {
 
     @PutMapping("/")
     @Transactional
-    public void editReservation(@RequestBody Reservation reservation)
+    public ResponseEntity<?> editReservation(@RequestBody Reservation reservation)
     {
-
-        Optional<Car> c = carRepository.findById(reservation.getCar().getId());
-        Optional<Reservation> res = reservationRepository.findById(reservation.getId());
-        if (res.isPresent() && c.isPresent())
-        {
-            res.get().setCar(c.get());
-            res.get().setCustomerId(reservation.getCustomerId());
-            res.get().setStartDate(reservation.getStartDate());
-            res.get().setEndDate(reservation.getEndDate());
+        try {
+            List<Reservation> listOfAllReservations = reservationRepository.findAll();
+            // checking if reservation doesn't have an invalid customer or car
+            for (Reservation res : listOfAllReservations) {
+                if ((res.getStartDate().isBefore(reservation.getStartDate()) && res.getEndDate().isAfter(reservation.getStartDate())) ||
+                        (res.getStartDate().isAfter(reservation.getStartDate()) && res.getEndDate().isBefore(reservation.getEndDate())) ||
+                        (res.getStartDate().isBefore(reservation.getEndDate()) && res.getEndDate().isAfter(reservation.getEndDate())) ||
+                        res.getStartDate().isEqual(reservation.getStartDate()) || res.getEndDate().isEqual(reservation.getEndDate())) {
+                    if (res.getCustomerId().equals(reservation.getCustomerId())) {
+                        return ResponseEntity.badRequest().body("given customer already rents a car in given period");
+                    }
+                    else if (res.getCar().getId().equals(reservation.getCar().getId())) {
+                        return ResponseEntity.badRequest().body("given car is already rented in given period");
+                    }
+                }
+            }
+            if (reservation.getStartDate().isBefore(reservation.getEndDate())) {
+                log.info("editing reservation {}", reservation);
+                return ResponseEntity.ok(reservationService.editReservation(reservation));
+            }
+            else {
+                return ResponseEntity.badRequest().body("given period is not valid - start date after end date");
+            }
         }
-        else log.info("the given id does not exist");
+        catch(Throwable t){
+            return ResponseEntity.badRequest().body(t.getMessage());
+        }
     }
 
-    /*@GetMapping("/{id}")
+    @GetMapping("/{id}")
     public double getPricing(@PathVariable Long id) {
         Optional<Reservation> reservation = reservationRepository.findById(id);
-        Optional<Customer> customer = customerRepository.findById(reservation.get().getCustomerId());
         if (reservation.isPresent())
         {
-            return Pricing.calculatePrice(reservationRepository.findById(id).get().getStartDate(), reservationRepository.findById(id).get().getEndDate(), customer, car);
+            return Pricing.calculatePrice(reservationRepository.findById(id).get().getStartDate(), reservationRepository.findById(id).get().getEndDate(),
+                    customerRepository.findById(reservation.get().getCustomerId()).get(), carRepository.findById(reservation.get().getCustomerId()).get());
         }
         else
             throw new RuntimeException("given reservation doesn't exist");
-
-
-
-    }*/
+    }
 
 }
