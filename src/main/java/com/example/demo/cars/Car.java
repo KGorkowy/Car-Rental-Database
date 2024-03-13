@@ -2,6 +2,7 @@ package com.example.demo.cars;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Table
@@ -15,7 +16,7 @@ public class Car {
     @NotBlank(message = "brand name is mandatory")
     @Column(nullable = false, length = 25)
     private String brand;
-    @NotBlank(message = "driven distance is mandatory")
+    @NotNull(message = "driven distance is mandatory")
     @Column(nullable = false, length = 10)
     private Integer drivenDistanceInKm;
     @NotBlank(message = "car type is mandatory")
@@ -24,7 +25,4 @@ public class Car {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-
-
-
 }

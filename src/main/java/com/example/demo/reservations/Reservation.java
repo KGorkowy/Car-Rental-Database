@@ -1,9 +1,11 @@
 package com.example.demo.reservations;
 
 
+import com.example.demo.cars.Car;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
+
+import java.time.LocalDate;
 
 @Table
 @Entity
@@ -12,18 +14,19 @@ public class Reservation {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    @NotBlank(message = "customer id is mandatory")
+    // @NotBlank(message = "customer id is mandatory")
     @Column(nullable = false, length = 10)
     private Long customerId;
-    @NotBlank(message = "car id is mandatory")
-    @Column(nullable = false, length = 25)
-    private Long carId;
+    // @NotBlank(message = "car id is mandatory")
+    @OneToOne
+    @JoinColumn(name = "car_id", referencedColumnName = "id")
+    private Car car;
     //@Pattern(regexp = "", message = "Date has a wrong format. It should be in a YYYY-MM-DD format.") difficulties with regexp
-    @NotBlank(message = "start date is mandatory")
+    // @NotBlank(message = "start date is mandatory")
     @Column(nullable = false, length = 15)
-    private String startDate;
+    private LocalDate startDate;
     //@Pattern(regexp = "", message = "Date has a wrong format. It should be in a YYYY-MM-DD format.") difficulties with regexp
-    @NotBlank(message = "start date is mandatory")
+    // @NotBlank(message = "start date is mandatory")
     @Column(nullable = false, length = 15)
-    private String endDate;
+    private LocalDate endDate;
 }

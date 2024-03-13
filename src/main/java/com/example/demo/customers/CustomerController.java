@@ -25,9 +25,8 @@ public class CustomerController {
     }
 
     @PostMapping("/")
-    @Transactional
-    public Customer addCustomer(@Valid @RequestBody Customer customer) {
-            return customerRepository.save(customer);
+    public Customer addCustomer(@RequestBody Customer customer) {
+        return customerRepository.save(customer);
     }
 
     @DeleteMapping("/{id}")
@@ -37,27 +36,29 @@ public class CustomerController {
 
     @PutMapping("/")
     @Transactional
-    public ResponseEntity<Void> editCustomer(@Valid @RequestBody Customer customer) {
-        Optional<Customer> customer1 = customerRepository.findById(customer.getId());
-        if (customer1.isPresent()) {
-            customer1.get().setFirstName(customer.getFirstName());
-            customer1.get().setSurname(customer.getSurname());
-            customer1.get().setPhoneNumber(customer.getPhoneNumber());
-            return ResponseEntity.ok().build();
-        }
-        return ResponseEntity.notFound().build();
+    public ResponseEntity editCustomer(@Valid @RequestBody Customer customer) {
+        return customerRepository.findById(customer.getId())
+                .map(customer1 -> {
+                    customer1.setFirstName(customer.getFirstName());
+                    customer1.setSurname(customer.getSurname());
+                    customer1.setPhoneNumber(customer.getPhoneNumber());
+                    //save
+                    return ResponseEntity.ok().build();
+                })
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
 
     @PutMapping("/discount")
     @Transactional
-    public ResponseEntity<Void> changeDiscount(@RequestParam Long id, @RequestParam double newDiscountPercentage) {
+    public ResponseEntity<Void> changeDiscount(@RequestParam Long id, @RequestParam double discount) {
         Optional<Customer> customer = customerRepository.findById(id);
         if (customer.isPresent()) {
-            customer.get().setDiscountPercentage(newDiscountPercentage);
+            customer.get().setDiscountPercentage(discount);
             return ResponseEntity.ok().build();
         }
         return ResponseEntity.notFound().build();
     }
 
 }
+// TODO: streams, optionals, services, try-catch
